@@ -11,7 +11,7 @@ profile("PYTHON_START")
 # it will break output redirection for crash logs.
 from Tools import RedirectOutput
 from Tools.Directories import resolveFilename, fileExists
-from boxbranding import getVisionVersion, getVisionRevision, getHaveMultiLib, getMachineBuild, getSoCFamily
+from boxbranding import getOpenFIXVersion, getOpenFIXRevision, getHaveMultiLib, getMachineBuild, getSoCFamily
 from enigma import getBoxType, getBoxBrand
 
 model = getBoxType()
@@ -19,8 +19,8 @@ brand = getBoxBrand()
 platform = getMachineBuild()
 socfamily = getSoCFamily()
 
-print("[mytest] Open Vision version = %s" % getVisionVersion())
-print("[mytest] Open Vision revision = %s" % getVisionRevision())
+print("[mytest] OpenFIX version = %s" % getOpenFIXVersion())
+print("[mytest] OpenFIX revision = %s" % getOpenFIXRevision())
 print("[mytest] Brand/Meta = %s" % brand)
 print("[mytest] Model = %s" % model)
 print("[mytest] Platform = %s" % platform)
@@ -33,7 +33,7 @@ enigma.eTimer = eBaseImpl.eTimer
 enigma.eSocketNotifier = eBaseImpl.eSocketNotifier
 enigma.eConsoleAppContainer = eConsoleImpl.eConsoleAppContainer
 
-if getVisionVersion().startswith("10") and not fileExists ("/var/tmp/ntpv4.local") and platform != "dm4kgen":
+if getOpenFIXVersion().startswith("10") and not fileExists ("/var/tmp/ntpv4.local") and platform != "dm4kgen":
 	from Components.Console import Console
 	print("[mytest] Try load all network interfaces.")
 	Console = Console()
