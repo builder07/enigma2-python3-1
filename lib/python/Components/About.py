@@ -73,7 +73,7 @@ def getBuildDateString():
 def getUpdateDateString():
 	try:
 		from glob import glob
-		build = [x.split("-")[-2:-1][0][-8:] for x in open(glob("/var/lib/opkg/info/openvision-bootlogo.control")[0], "r") if x.startswith("Version:")][0]
+		build = [x.split("-")[-2:-1][0][-8:] for x in open(glob("/var/lib/opkg/info/openfix-branding.control")[0], "r") if x.startswith("Version:")][0]
 		if build.isdigit():
 			return  "%s-%s-%s" % (build[:4], build[4:6], build[6:])
 	except:
@@ -110,35 +110,19 @@ def getKernelVersionString():
 	except:
 		return _("unknown")
 
-def getCPUBenchmark():
-	try:
-		cpucount = 0
-		for line in open("/proc/cpuinfo").readlines():
-			line = [x.strip() for x in line.strip().split(":")]
-			if line[0] == "processor":
-				cpucount += 1
-
-		if not fileExists("/tmp/dhry.txt"):
-			cmdbenchmark = "dhry > /tmp/dhry.txt"
-			Console().ePopen(cmdbenchmark)
-		if fileExists("/tmp/dhry.txt"):
-			cpubench = os.popen("cat /tmp/dhry.txt | grep 'Open Vision DMIPS' | sed 's|[^0-9]*||'").read().strip()
-			benchmarkstatus = os.popen("cat /tmp/dhry.txt | grep 'Open Vision CPU status' | cut -f2 -d':'").read().strip()
-
-		if cpucount > 1:
-			cpumaxbench = int(cpubench)*int(cpucount)
-			return "%s DMIPS per core\n%s DMIPS for all (%s) cores (%s)" % (cpubench, cpumaxbench, cpucount, benchmarkstatus)
-		else:
-			return "%s DMIPS (%s)" % (cpubench, benchmarkstatus)
-	except:
-		return _("unknown")
-
 def getCPUSerial():
 	with open('/proc/cpuinfo','r') as f:
 		for line in f:
 			if line[0:6] == 'Serial':
 				return line[10:26]
 		return "0000000000000000"
+
+def getImageTypeString():
+	try:
+		image_type = open("/etc/issue").readlines()[-2].strip()[:-6]
+		return image_type.capitalize()
+	except:
+		return _("undefined")
 
 def getCPUInfoString():
 	try:
@@ -227,7 +211,7 @@ def getFlashType():
 	elif SystemInfo["MiddleFlash"]:
 		return _("Middle - Lite image")
 	else:
-		return _("Enough - Vision image")
+		return _("Enough - OpenFIX image")
 
 def getDVBAPI():
 	if SystemInfo["OLDE2API"]:
@@ -235,8 +219,8 @@ def getDVBAPI():
 	else:
 		return _("New")
 
-def getVisionModule():
-	if SystemInfo["OpenVisionModule"]:
+def getOpenFIXModule():
+	if SystemInfo["OpenFIXModule"]:
 		return _("Loaded")
 	else:
 		return _("Unknown, multiboot situation!")
@@ -315,6 +299,15 @@ def getBoxUptime():
 		return  "%s" % time
 	except:
 		return '-'
+		
+def getIdea():
+		return _("BlackFish")
+
+def getEmail():
+		return _("blackfish.3654@gmail.com")
+	
+def getDonate():
+		return _("Z541154775569")		
 
 # For modules that do "from About import about"
 about = sys.modules[__name__]
