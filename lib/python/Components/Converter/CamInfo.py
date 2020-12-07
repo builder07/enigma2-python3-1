@@ -7,7 +7,7 @@ from Tools.Directories import fileExists, resolveFilename, SCOPE_PLUGINS
 from Components.Converter.Poll import Poll
 
 
-class VisionCamInfo(Poll, Converter, object):
+class CamInfo(Poll, Converter, object):
 	def __init__(self, type):
 		Converter.__init__(self, type)
 		Poll.__init__(self)
