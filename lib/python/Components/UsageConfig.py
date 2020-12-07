@@ -49,7 +49,7 @@ def InitUsageConfig():
 	config.usage.record_indicator_mode = ConfigSelection(default = "3", choices = [("0", _("None")), ("1", _("Left from servicename")), ("2", _("Right from servicename")), ("3", _("Red colored"))])
 	config.usage.record_indicator_mode.addNotifier(refreshServiceList)
 
-	config.usage.virtualkeyBoard_style = ConfigSelection(default='OV', choices=[('OV', _('Open Vision')), ('e2', _('enigma2 default'))])
+	config.usage.virtualkeyBoard_style = ConfigSelection(default='OF', choices=[('OF', _('OpenFIX')), ('e2', _('enigma2 default'))])
 
 	choicelist = [("-1", _("Disable"))]
 	for i in range(0,1300,100):
@@ -1310,7 +1310,7 @@ def InitUsageConfig():
 	config.autolanguage.subtitle_defaultdvb = ConfigYesNo(default = False)
 	config.autolanguage.subtitle_usecache = ConfigYesNo(default = True)
 
-	config.visionsettings = ConfigSubsection()
+	config.openfixsettings = ConfigSubsection()
 
 	config.oscaminfo = ConfigSubsection()
 	if SystemInfo["OScamInstalled"] or SystemInfo["NCamInstalled"]:
