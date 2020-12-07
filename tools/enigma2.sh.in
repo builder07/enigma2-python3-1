@@ -6,9 +6,9 @@ datarootdir=@datarootdir@
 
 export PATH=$PATH:/usr/script
 
-brandcheck=`cat /etc/openvision/brand`
-modelcheck=`cat /etc/openvision/model`
-platformcheck=`cat /etc/openvision/platform`
+brandcheck=`cat /etc/openfix/brand`
+modelcheck=`cat /etc/openfix/model`
+platformcheck=`cat /etc/openfix/platform`
 
 if [ $brandcheck == "mecool" ]; then
 	export media_arm_audio_decoder=ape,flac,dts,ac3,eac3,wma,wmapro,mp3,aac,vorbis,raac,cook,amr,pcm,adpcm
