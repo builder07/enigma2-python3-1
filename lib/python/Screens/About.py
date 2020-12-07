@@ -72,6 +72,15 @@ class About(Screen):
 
 		# [WanWizard] Removed until we find a reliable way to determine the installation date
 		# AboutText += _("Installed: ") + about.getFlashDateString() + "\n"
+		
+		AboutText += "\n"
+
+		image = boxbranding.getOpenFIXVersion()
+		if image is not None:
+			AboutText += _("Image: OpenFIX ") + image + "\n"    	  					           	
+		ImageVersion = _("Last update: ") + about.getImageVersionString()
+		self["ImageVersion"] = StaticText(ImageVersion)
+		AboutText += ImageVersion + "\n"
 
 		EnigmaVersion = about.getEnigmaVersionString()
 		EnigmaVersion = EnigmaVersion.rsplit("-", EnigmaVersion.count("-") - 2)
@@ -82,12 +91,11 @@ class About(Screen):
 		EnigmaVersion = _("Enigma2 version: ") + EnigmaVersion
 		self["EnigmaVersion"] = StaticText(EnigmaVersion)
 		AboutText += "\n" + EnigmaVersion + "\n"
-		AboutText += _("Last update: ") + about.getUpdateDateString() + "\n"
 		AboutText += _("Enigma2 (re)starts: %d\n") % config.misc.startCounter.value
 		AboutText += _("Enigma2 debug level: %d\n") % eGetEnigmaDebugLvl()
 
-		if fileExists("/etc/openvision/mediaservice"):
-			mediaservice = open("/etc/openvision/mediaservice", "r").read().strip()
+		if fileExists("/etc/openfix/mediaservice"):
+			mediaservice = open("/etc/openfix/mediaservice", "r").read().strip()
 			AboutText += _("Media service: ") + mediaservice.replace("enigma2-plugin-systemplugins-","") + "\n"
 
 		AboutText += "\n"
@@ -108,10 +116,10 @@ class About(Screen):
 		AboutText += "\n"
 
 		fp_version = getFPVersion()
-		if fp_version is None or fp_version == "unknown":
+		if fp_version is None:
 			fp_version = ""
 		else:
-			fp_version = _("Front processor version: %s") % fp_version
+			fp_version = _("Frontprocessor version: %s") % fp_version
 
 			AboutText += fp_version + "\n"
 
@@ -155,6 +163,14 @@ class About(Screen):
 			AboutText += "\n" + x[0] + ": " + x[1]
 		AboutText += '\n\n' + _("Uptime") + ": " + about.getBoxUptime()
 
+		AboutText += "\n"
+		AboutText += "\n"
+		
+		AboutText += _("Additional image information: ") + "\n"
+		AboutText += _("Idea: ") + about.getIdea() + "\n"
+		AboutText += _("E-mail: ") + about.getEmail() + "\n"
+		AboutText += _("Donate: ") + about.getDonate() + "\n"
+
 		self["AboutScrollLabel"] = ScrollLabel(AboutText)
 		self["key_green"] = Button(_("Translations"))
 		self["key_red"] = Button(_("Latest Commits"))
@@ -184,158 +200,6 @@ class About(Screen):
 
 	def showTroubleshoot(self):
 		self.session.open(Troubleshoot)
-
-class OpenVisionInformation(Screen):
-	def __init__(self, session):
-		Screen.__init__(self, session)
-		self.setTitle(_("Open Vision information"))
-
-		OpenVisionInformationText = _("Open Vision information") + "\n"
-
-		OpenVisionInformationText += "\n"
-
-		if config.misc.OVupdatecheck.value is True:
-			try:
-				if boxbranding.getVisionVersion().startswith("10"):
-					ovurl = "https://raw.githubusercontent.com/Hains/openvision-dm920-python3/master/meta-openvision/conf/distro/openvision.conf"
-				else:
-					ovurl = "https://raw.githubusercontent.com/OpenVisionE2/openvision-oe/develop/meta-openvision/conf/distro/revision.conf"
-				ovresponse = urllib.request.urlopen(ovurl)
-				ovrevision = ovresponse.read().decode()
-				ovrevisionupdate = ovrevision.split('r')[1][:3]
-			except Exception as e:
-				ovrevisionupdate = _("Requires internet connection")
-		else:
-			ovrevisionupdate = _("Disabled in configuration")
-
-		if fileExists("/etc/openvision/visionversion"):
-			visionversion = open("/etc/openvision/visionversion", "r").read().strip()
-			OpenVisionInformationText += _("Open Vision version: ") + visionversion + "\n"
-		else:
-			OpenVisionInformationText += _("Open Vision version: ") + boxbranding.getVisionVersion() + "\n"
-
-		if fileExists("/etc/openvision/visionrevision"):
-			visionrevision = open("/etc/openvision/visionrevision", "r").read().strip()
-			OpenVisionInformationText += _("Open Vision revision: ") + visionrevision + " " + _("(Latest revision on github: ") + str(ovrevisionupdate) + ")" + "\n"
-		else:
-			OpenVisionInformationText += _("Open Vision revision: ") + boxbranding.getVisionRevision() + " " + _("(Latest revision on github: ") + str(ovrevisionupdate) + ")" + "\n"
-
-		if fileExists("/etc/openvision/visionlanguage"):
-			visionlanguage = open("/etc/openvision/visionlanguage", "r").read().strip()
-			OpenVisionInformationText += _("Open Vision language: ") + visionlanguage + "\n"
-
-		OpenVisionInformationText += _("Open Vision module: ") + about.getVisionModule() + "\n"
-		OpenVisionInformationText += _("Flash type: ") + about.getFlashType() + "\n"
-
-		OpenVisionInformationText += "\n"
-
-		boxrctype = getBoxRCType()
-		if boxrctype is not None and boxrctype != "unknown":
-			OpenVisionInformationText += _("Factory RC type: ") + boxrctype + "\n"
-		if boxrctype is not None and boxrctype == "unknown":
-			if fileExists("/usr/bin/remotecfg"):
-				OpenVisionInformationText += _("RC type: ") + _("Amlogic remote") + "\n"
-			elif fileExists("/usr/sbin/lircd"):
-				OpenVisionInformationText += _("RC type: ") + _("LIRC remote") + "\n"
-
-		OpenVisionInformationText += _("Open Vision RC type: ") + boxbranding.getRCType() + "\n"
-		OpenVisionInformationText += _("Open Vision RC name: ") + boxbranding.getRCName() + "\n"
-		OpenVisionInformationText += _("Open Vision RC ID number: ") + boxbranding.getRCIDNum() + "\n"
-
-		OpenVisionInformationText += "\n"
-
-		if SystemInfo["HiSilicon"]:
-			OpenVisionInformationText += _("HiSilicon dedicated information") + "\n"
-
-			grab = os.popen("opkg list-installed | grep -- -grab | cut -f4 -d'-'").read().strip()
-			if grab != "" and grab != "r0":
-				OpenVisionInformationText += _("Grab: ") + grab + "\n"
-
-			hihalt = os.popen("opkg list-installed | grep -- -hihalt | cut -f4 -d'-'").read().strip()
-			if hihalt != "":
-				OpenVisionInformationText += _("Halt: ") + hihalt + "\n"
-
-			libs = os.popen("opkg list-installed | grep -- -libs | cut -f4 -d'-'").read().strip()
-			if libs != "":
-				OpenVisionInformationText += _("Libs: ") + libs + "\n"
-
-			partitions = os.popen("opkg list-installed | grep -- -partitions | cut -f4 -d'-'").read().strip()
-			if partitions != "":
-				OpenVisionInformationText += _("Partitions: ") + partitions + "\n"
-
-			reader = os.popen("opkg list-installed | grep -- -reader | cut -f4 -d'-'").read().strip()
-			if reader != "":
-				OpenVisionInformationText += _("Reader: ") + reader + "\n"
-
-			showiframe = os.popen("opkg list-installed | grep -- -showiframe | cut -f4 -d'-'").read().strip()
-			if showiframe != "":
-				OpenVisionInformationText += _("Showiframe: ") + showiframe + "\n"
-
-			OpenVisionInformationText += "\n"
-
-		OpenVisionInformationText += _("Image architecture: ") + boxbranding.getImageArch() + "\n"
-		if boxbranding.getImageFolder() != "":
-			OpenVisionInformationText += _("Image folder: ") + boxbranding.getImageFolder() + "\n"
-		if boxbranding.getImageFileSystem() != "":
-			OpenVisionInformationText += _("Image file system: ") + boxbranding.getImageFileSystem() + "\n"
-		OpenVisionInformationText += _("Image: ") + boxbranding.getImageDistro() + "\n"
-		OpenVisionInformationText += _("Feed URL: ") + boxbranding.getFeedsUrl() + "\n"
-
-		OpenVisionInformationText += _("Compiled by: ") + boxbranding.getDeveloperName() + "\n"
-		OpenVisionInformationText += _("Build date: ") + about.getBuildDateString() + "\n"
-
-		OpenVisionInformationText += _("OE: ") + boxbranding.getImageBuild() + "\n"
-
-		OpenVisionInformationText += "\n"
-
-		if boxbranding.getImageFPU() != "":
-			OpenVisionInformationText += _("FPU: ") + boxbranding.getImageFPU() + "\n"
-
-		if boxbranding.getImageArch() == "aarch64":
-			if boxbranding.getHaveMultiLib() == "True":
-				OpenVisionInformationText += _("MultiLib: ") + _("Yes") + "\n"
-			else:
-				OpenVisionInformationText += _("MultiLib: ") + _("No") + "\n"
-
-		OpenVisionInformationText += "\n"
-
-		if boxbranding.getMachineMtdBoot() != "":
-			OpenVisionInformationText += _("MTD boot: ") + boxbranding.getMachineMtdBoot() + "\n"
-		if boxbranding.getMachineMtdRoot() != "":
-			OpenVisionInformationText += _("MTD root: ") + boxbranding.getMachineMtdRoot() + "\n"
-		if boxbranding.getMachineMtdKernel() != "":
-			OpenVisionInformationText += _("MTD kernel: ") + boxbranding.getMachineMtdKernel() + "\n"
-
-		if boxbranding.getMachineRootFile() != "":
-			OpenVisionInformationText += _("Root file: ") + boxbranding.getMachineRootFile() + "\n"
-		if boxbranding.getMachineKernelFile() != "":
-			OpenVisionInformationText += _("Kernel file: ") + boxbranding.getMachineKernelFile() + "\n"
-
-		if boxbranding.getMachineMKUBIFS() != "":
-			OpenVisionInformationText += _("MKUBIFS: ") + boxbranding.getMachineMKUBIFS() + "\n"
-		if boxbranding.getMachineUBINIZE() != "":
-			OpenVisionInformationText += _("UBINIZE: ") + boxbranding.getMachineUBINIZE() + "\n"
-
-		OpenVisionInformationText += "\n"
-
-		if fileExists("/proc/device-tree/amlogic-dt-id"):
-			devicetid = open("/proc/device-tree/amlogic-dt-id", "r").read().strip()
-			OpenVisionInformationText += _("Device id: ") + devicetid + "\n"
-
-		if fileExists("/proc/device-tree/le-dt-id"):
-			giventid = open("/proc/device-tree/le-dt-id", "r").read().strip()
-			OpenVisionInformationText += _("Given device id: ") + giventid + "\n"
-
-		self["AboutScrollLabel"] = ScrollLabel(OpenVisionInformationText)
-		self["key_red"] = Button(_("Close"))
-
-		self["actions"] = ActionMap(["ColorActions", "SetupActions", "DirectionActions"],
-			{
-				"cancel": self.close,
-				"ok": self.close,
-				"up": self["AboutScrollLabel"].pageUp,
-				"down": self["AboutScrollLabel"].pageDown
-			})
 
 class DVBInformation(Screen):
 	def __init__(self, session):
@@ -415,7 +279,7 @@ class DVBInformation(Screen):
 
 		self["AboutScrollLabel"] = ScrollLabel(DVBInformationText)
 		self["key_red"] = Button(_("Close"))
-
+                 
 		self["actions"] = ActionMap(["ColorActions", "SetupActions", "DirectionActions"],
 			{
 				"cancel": self.close,
@@ -423,6 +287,40 @@ class DVBInformation(Screen):
 				"up": self["AboutScrollLabel"].pageUp,
 				"down": self["AboutScrollLabel"].pageDown
 			})
+			
+class PartnersAndSponsors(Screen):
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.setTitle(_("Partners and Sponsors"))
+
+		self["key_red"] = Button(_("Close"))
+		self["key_green"] = Button(_("Become a member"))
+		
+		self["actions"] = ActionMap(["ColorActions", "SetupActions", "DirectionActions"],		
+                 
+			{
+				"cancel": self.close,
+				"ok": self.close,
+                                 "green": self.showForPartnersInfo
+			})
+
+	def showForPartnersInfo(self):
+		self.session.open(ForPartnersInfo)	
+
+class ForPartnersInfo(Screen):
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.setTitle(_("Become a member"))
+
+		self["key_red"] = Button(_("Cancel"))
+
+		self["Info"] = StaticText(_("To the attention of Partners and Sponsors!!! Your information can be posted here. For all questions, please contact by e-mail: blackfish.3654@gmail.com"))
+
+		self["actions"] = ActionMap(["SetupActions"],
+			{
+				"cancel": self.close,
+				"ok": self.close
+			})			
 
 class Geolocation(Screen):
 	def __init__(self, session):
@@ -934,9 +832,9 @@ class SystemMemoryInfo(Screen):
 		title = screentitle
 		Screen.setTitle(self, title)
 		self.skinName = ["SystemMemoryInfo", "About"]
-		self["lab1"] = StaticText(_("Open Vision enigma2 image"))
-		self["lab2"] = StaticText(_("by Open Vision developers"))
-		self["lab3"] = StaticText(_("Support at %s") % "https://openvision.tech")
+		self["lab1"] = StaticText(_("OpenFIX enigma2 image"))
+		self["lab2"] = StaticText(_("by OpenFIX developers"))
+		self["lab3"] = StaticText(_("Support at %s") % "https://gisclub.tv")
 		self["AboutScrollLabel"] = ScrollLabel()
 
 		self["key_red"] = Button(_("Close"))
@@ -1051,21 +949,21 @@ class CommitInfo(Screen):
 		except:
 			branch = ""
 
-		if boxbranding.getVisionVersion().startswith("10"):
-			oegiturl = "https://api.github.com/repos/OpenVisionE2/openvision-development-platform/commits"
+		if boxbranding.getOpenFIXVersion().startswith("10"):
+			oegiturl = "https://api.github.com/repos/OpenFIXE2/openfix-development-platform/commits"
 		else:
-			oegiturl = "https://api.github.com/repos/OpenVisionE2/openvision-oe/commits"
+			oegiturl = "https://api.github.com/repos/OpenFIXE2/openfix-oe/commits"
 
 		self.project = 0
 		self.projects = [
-			("https://api.github.com/repos/OpenVisionE2/enigma2-openvision/commits" + branch, "Enigma2 - Vision"),
-			(oegiturl, "OE - Vision"),
-			("https://api.github.com/repos/OpenVisionE2/enigma2-plugins/commits", "Enigma2 plugins"),
-			("https://api.github.com/repos/OpenVisionE2/alliance-plugins/commits", "Alliance plugins"),
-			("https://api.github.com/repos/OpenVisionE2/OpenWebif/commits", "Open WebIF"),
-			("https://api.github.com/repos/OpenVisionE2/openvision-core-plugin/commits", "Vision core plugin"),
-			("https://api.github.com/repos/OpenVisionE2/BackupSuite/commits", "Backup Suite plugin"),
-			("https://api.github.com/repos/OpenVisionE2/OctEtFHD-skin/commits", "OctEtFHD skin")
+			("https://api.github.com/repos/OpenFIXE2/enigma2-openfix/commits" + branch, "Enigma2 - OpenFIX"),
+			(oegiturl, "OE - OpenFIX"),
+			("https://api.github.com/repos/OpenFIXE2/enigma2-plugins/commits", "Enigma2 plugins"),
+			("https://api.github.com/repos/OpenFIXE2/alliance-plugins/commits", "Alliance plugins"),
+			("https://api.github.com/repos/OpenFIXE2/OpenWebif/commits", "Open WebIF"),
+			("https://api.github.com/repos/OpenFIXE2/openfix-core-plugin/commits", "OpenFIX core plugin"),
+			("https://api.github.com/repos/OpenFIXE2/BackupSuite/commits", "Backup Suite plugin"),
+			("https://api.github.com/repos/OpenFIXE2/OctEtFHD-skin/commits", "OctEtFHD skin")
 		]
 		self.cachedProjects = {}
 		self.Timer = eTimer()
