@@ -79,7 +79,7 @@ class VirtualKeyBoard(Screen, HelpableScreen):
 			VKB_SAVE_TEXT: ("Save", _("Save")),
 			VKB_SEARCH_TEXT: ("Search", _("Search"))
 		}.get(style, ("Enter", u"ENTERICON"))
-		if config.usage.virtualkeyBoard_style.value == "OV":
+		if config.usage.virtualkeyBoard_style.value == "OF":
 			if isHD():
 				self.skinName = 'vkeyboard_hdskin'
 				self.bg = LoadPixmap('/usr/share/enigma2/VirtualKeyBoard_Icons/buttonsHD/vkey_bg.png')
